@@ -201,20 +201,4 @@ Beyond individual scoring, OR-Tools enforces system-level constraints simultaneo
 
 ---
 
-## 📚 References
 
-- [UITP — AI in Public Transport](https://www.uitp.org/news/ai-in-public-transport/)
-- [Research on Mileage Balancing in Metro Systems](https://doi.org/10.1177/09544097211025345)
-- [IoT in Railways — IEEE Xplore](https://ieeexplore.ieee.org/document/8911381)
-- [IBM Maximo](https://www.ibm.com/products/maximo)
-- [Kochi Metro Rail Limited](https://kochimetro.org/)
-- [GTFS Open Data Standard](https://transformative-mobility.org/open-data-standard-for-better-public-transport-the-general-transit-feed-specification-gtfs/)
-
----
-
-<div align="center">
-
-**Team Neural Railways** · Smart India Hackathon 2025  
-Built with ❤️ for smarter, safer urban mobility.
-
-```
