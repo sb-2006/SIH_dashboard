@@ -49,34 +49,59 @@ Every night between **21:00–23:00 IST**, KMRL supervisors must decide which of
 ---
 
 ## 🏗️ Architecture Overview
+          
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         DATA SOURCES                                │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌────────────┐  │
+│  │ IoT/UNS      │  │ IBM Maximo   │  │ Fitness  │  │  Manual    │  │
+│  │ Sensor Feeds │  │ Job-Card     │  │ Cert DB  │  │  Overrides │  │
+│  │ (Real-time)  │  │ Exports      │  │          │  │  (Web UI)  │  │
+│  └──────┬───────┘  └──────┬───────┘  └────┬─────┘  └─────┬──────┘  │
+└─────────┼─────────────────┼───────────────┼───────────────┼─────────┘
+          └─────────────────┴───────────────┴───────────────┘
+                                    │
+                    ┌───────────────▼────────────────┐
+                    │      DATA CLEANING &            │
+                    │      VALIDATION LAYER           │
+                    │  (Missing values, type checks,  │
+                    │   fitness cert validation)       │
+                    └───────────────┬────────────────┘
+                                    │
+                    ┌───────────────▼────────────────┐
+                    │      FEATURE ENGINEERING        │
+                    │  (MinMaxScaler normalization,   │
+                    │   interaction term computation) │
+                    └───────────────┬────────────────┘
+                                    │
+               ┌────────────────────┼───────────────────┐
+               │                    │                   │
+    ┌──────────▼──────┐   ┌─────────▼──────┐  ┌────────▼────────┐
+    │  Neural Network  │   │  Weighted       │  │  Google OR-     │
+    │  Readiness       │   │  Scoring        │  │  Tools SCIP     │
+    │  Predictor       │   │  Engine         │  │  Solver         │
+    │  (service prob.) │   │  (0–1 score)    │  │  (constraints)  │
+    └──────────┬───────┘   └─────────┬───────┘  └────────┬────────┘
+               └────────────────────┼───────────────────┘
+                                    │
+                    ┌───────────────▼────────────────┐
+                    │         DECISION ENGINE         │
+                    │   (Ranked Induction List,       │
+                    │    Conflict Alerts, Audit Log)  │
+                    └───────────────┬────────────────┘
+                                    │
+               ┌────────────────────┼───────────────────┐
+               │                                        │
+    ┌──────────▼──────────┐              ┌──────────────▼──────────┐
+    │   REACT DASHBOARD   │              │    REST API (Flask /     │
+    │   - Ranked list      │              │    FastAPI)              │
+    │   - Mapbox stabling  │              │    - /ingest             │
+    │   - Conflict alerts  │              │    - /optimize           │
+    │   - What-if panel    │              │    - /simulate           │
+    │   - KPI metrics      │              │    - /alerts             │
+    └─────────────────────┘              └─────────────────────────┘
+```
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      DATA SOURCES                           │
-│  IoT/UNS Streams · IBM Maximo Exports · Manual Overrides   │
-└─────────────────┬───────────────────────────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  DATA PIPELINE (Python)                      │
-│   Cleaning & Validation → Feature Engineering (MinMaxScaler)│
-└─────────────────┬───────────────────────────────────────────┘
-                  │
-         ┌────────┴────────┐
-         ▼                 ▼
-┌─────────────────┐  ┌─────────────────────┐
-│  Neural Network │  │  Google OR-Tools    │
-│ (Readiness Score│  │  SCIP Solver        │
-│  Prediction)    │  │  (Multi-Objective   │
-│                 │  │   Optimization)     │
-└────────┬────────┘  └──────────┬──────────┘
-         └────────────┬─────────┘
-                      ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  DECISION DASHBOARD (React)                  │
-│  Ranked List · Conflict Alerts · Simulations · Mapbox GL    │
-└─────────────────────────────────────────────────────────────┘
-```
 
 ---
 
